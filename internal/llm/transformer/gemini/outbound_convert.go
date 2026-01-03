@@ -374,8 +374,21 @@ func convertLLMMessageToGeminiContent(msg *llm.Message) *Content {
 		}
 	}
 
+	// If no parts were created but the message has tool calls or other metadata,
+	// we still need to return a valid content to preserve the message structure.
+	// This ensures that tool-related messages are not lost during conversion.
+	if len(parts) == 0 && len(msg.ToolCalls) > 0 {
+		// Create an empty text part to hold the message structure for tool calls
+		parts = append(parts, &Part{Text: ""})
+	}
+
+	// If still no parts, still return a valid content with empty parts array
+	// This preserves the message role and ensures Gemini receives the request
 	if len(parts) == 0 {
-		return nil
+		// Return content with empty parts array instead of nil
+		// This ensures the message role is preserved
+		content.Parts = []*Part{}
+		return content
 	}
 
 	content.Parts = parts

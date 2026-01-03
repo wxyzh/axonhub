@@ -268,8 +268,14 @@ type Tool struct {
 
 // ToLLMTool converts OpenAI Tool to unified llm.Tool.
 func (t Tool) ToLLMTool() llm.Tool {
+	toolType := t.Type
+	// Provide default type for function tools if not specified
+	// OpenAI API uses omitempty for type field, so it may be empty for function tools
+	if toolType == "" && t.Function.Name != "" {
+		toolType = "function"
+	}
 	return llm.Tool{
-		Type: t.Type,
+		Type: toolType,
 		Function: llm.Function{
 			Name:        t.Function.Name,
 			Description: t.Function.Description,

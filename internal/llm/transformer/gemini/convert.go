@@ -100,9 +100,10 @@ func convertGeminiFinishReasonToLLM(reason string, hasToolCall bool) *string {
 
 	switch reason {
 	case "STOP":
-		llmReason = "stop"
 		if hasToolCall {
 			llmReason = "tool_calls"
+		} else {
+			llmReason = "stop"
 		}
 	case "MAX_TOKENS":
 		llmReason = "length"
